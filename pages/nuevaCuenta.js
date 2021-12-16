@@ -14,6 +14,13 @@ const NuevaCuenta = () => {
     },
     validationSchema: Yup.object({
       nombre: Yup.string().required("El nombre es obligatorio"),
+      apellido: Yup.string().required("El apellido es obligatorio"),
+      email: Yup.string()
+        .email("El email no es valido")
+        .required("El email es requerido"),
+      password: Yup.string()
+        .required("El password no puede ir vacio")
+        .min(6, "El password debe ser al menos de 6 caracteres"),
     }),
     onSubmit: (valores) => {
       console.log("enviando");
@@ -71,8 +78,16 @@ const NuevaCuenta = () => {
                   placeholder="Apellido Usuario"
                   value={formik.values.apellido}
                   onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                 />
               </div>
+
+              {formik.touched.apellido && formik.errors.apellido ? (
+                <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+                  <p className="font-bold">Error</p>
+                  <p>{formik.errors.apellido}</p>
+                </div>
+              ) : null}
 
               <div className="mb-4">
                 <label
@@ -88,8 +103,15 @@ const NuevaCuenta = () => {
                   placeholder="Email Usuario"
                   value={formik.values.email}
                   onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                 />
               </div>
+              {formik.touched.email && formik.errors.email ? (
+                <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+                  <p className="font-bold">Error</p>
+                  <p>{formik.errors.email}</p>
+                </div>
+              ) : null}
 
               <div className="mb-4">
                 <label
@@ -105,8 +127,16 @@ const NuevaCuenta = () => {
                   placeholder="Password Usuario"
                   value={formik.values.password}
                   onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                 />
               </div>
+
+              {formik.touched.password && formik.errors.password ? (
+                <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+                  <p className="font-bold">Error</p>
+                  <p>{formik.errors.password}</p>
+                </div>
+              ) : null}
 
               <input
                 type="submit"
