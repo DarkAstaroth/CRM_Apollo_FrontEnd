@@ -2,8 +2,28 @@ import React from "react";
 import Layout from "../components/Layout";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useMutation, gql } from "@apollo/client";
+import Swal from "sweetalert2";
+import { useRouter } from "next/router";
+
+const NUEVA_CUENTA = gql`
+  mutation nuevoUsuario($input: UsuarioInput) {
+    nuevoUsuario(input: $input) {
+      id
+      nombre
+      apellido
+      email
+    }
+  }
+`;
 
 const NuevaCuenta = () => {
+  // Mutation para crear nuevos usuarios
+  const [nuevoUsuario] = useMutation(NUEVA_CUENTA);
+
+  // Routing
+  const router = useRouter();
+
   // validacion del formulario
   const formik = useFormik({
     initialValues: {
@@ -22,9 +42,35 @@ const NuevaCuenta = () => {
         .required("El password no puede ir vacio")
         .min(6, "El password debe ser al menos de 6 caracteres"),
     }),
-    onSubmit: (valores) => {
-      console.log("enviando");
-      console.log(valores);
+    onSubmit: async (valores) => {
+      const { nombre, apellido, email, password } = valores;
+
+      try {
+        const { data } = await nuevoUsuario({
+          variables: {
+            input: {
+              nombre,
+              apellido,
+              email,
+              password,
+            },
+          },
+        });
+        console.log(data);
+        // Usuario creado correctamente
+
+        Swal.fire({
+          icon: "success",
+          title: "Buen Trabajo!",
+          text: "Usuario Registrado con exito!",
+          // footer: '<a href="/login">Iniciar Sesion?</a>',
+        });
+
+        // Redirigir usuario para iniciar sesion
+        router.push("/login");
+      } catch (error) {
+        Swal.fire("Uups!", `${error.message}`, "error");
+      }
     },
   });
 
