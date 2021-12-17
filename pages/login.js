@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { gql, useMutation } from "@apollo/client";
 import Swal from "sweetalert2";
+import { useRouter } from "next/router";
 
 const AUTENTICAR_USUARIO = gql`
   mutation AutenticarUsuario($input: AutenticarInput) {
@@ -16,6 +17,7 @@ const AUTENTICAR_USUARIO = gql`
 const Login = () => {
   // mutation para crear nuevos usuarios en apollo
   const [autenticarUsuario] = useMutation(AUTENTICAR_USUARIO);
+  const router = useRouter();
 
   const formik = useFormik({
     initialValues: {
@@ -29,7 +31,6 @@ const Login = () => {
       password: Yup.string().required("El password es obligatorio"),
     }),
     onSubmit: async (valores) => {
-      console.log(valores);
       const { email, password } = valores;
       try {
         const { data } = await autenticarUsuario({
@@ -41,8 +42,18 @@ const Login = () => {
           },
         });
         console.log(data);
+        // Guardar el token en el local storage
+        const { token } = data.autenticarUsuario;
+        localStorage.setItem("token", token);
+        // Usuario autenticado correctamente
+        Swal.fire({
+          icon: "success",
+          title: "Bienvenido!",
+          // footer: '<a href="/login">Iniciar Sesion?</a>',
+        });
+        // Redireccionar hacia clientes
+        router.push("/");
       } catch (error) {
-        console.log(error);
         Swal.fire("Uups!", `${error.message}`, "error");
       }
     },

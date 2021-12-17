@@ -66,6 +66,7 @@ const NuevaCuenta = () => {
           // footer: '<a href="/login">Iniciar Sesion?</a>',
         });
 
+
         // Redirigir usuario para iniciar sesion
         router.push("/login");
       } catch (error) {
