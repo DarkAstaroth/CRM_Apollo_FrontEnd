@@ -18,9 +18,6 @@ const Header = () => {
   // query de apollo
   const { data, loading, error } = useQuery(OBTENER_USUARIO);
 
-  console.log(data);
-  console.log(loading);
-
   // Proteger que no accedamos a data antes de tener resultados
   if (loading) {
     return <p>Loading...</p>;
@@ -31,7 +28,6 @@ const Header = () => {
     localStorage.removeItem("token");
     router.push("/login");
   };
-  console.log(data);
 
   return (
     <>
