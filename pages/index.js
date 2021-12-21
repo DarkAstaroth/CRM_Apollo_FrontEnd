@@ -1,5 +1,7 @@
 import Layout from "../components/Layout";
 import { gql, useQuery } from "@apollo/client";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 const OBTENER_CLIENTES_USUARIO = gql`
   query obtenerClientesVendedor {
@@ -14,9 +16,19 @@ const OBTENER_CLIENTES_USUARIO = gql`
 `;
 
 const Home = () => {
+  const router = useRouter();
   // consulta de apollo
-  const { data, loading, error } = useQuery(OBTENER_CLIENTES_USUARIO);
-  console.log(data);
+  const { data, loading, client } = useQuery(OBTENER_CLIENTES_USUARIO);
+  console.log(client);
+
+  if (loading) return "...Cargando";
+
+  if (!data.obtenerClientesVendedor) {
+    client.clearStore();
+    router.push("/login");
+    return <p>Loading...</p>;
+  }
+
   return (
     <>
       <Layout>
