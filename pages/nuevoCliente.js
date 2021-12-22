@@ -2,8 +2,29 @@ import { useFormik } from "formik";
 import React from "react";
 import Layout from "../components/Layout";
 import * as Yup from "yup";
+import { gql, useMutation } from "@apollo/client";
+import { useRouter } from "next/router";
+import Swal from "sweetalert2";
+
+const NUEVO_CLIENTE = gql`
+  mutation NuevoCliente($input: ClienteInput) {
+    nuevoCliente(input: $input) {
+      id
+      nombre
+      apellido
+      empresa
+      email
+      telefono
+    }
+  }
+`;
 
 const NuevoCliente = () => {
+  const router = useRouter();
+
+  // Mutation para crear nuevos clientes
+  const [nuevoCliente] = useMutation(NUEVO_CLIENTE);
+
   const formik = useFormik({
     initialValues: {
       nombre: "",
@@ -20,8 +41,30 @@ const NuevoCliente = () => {
         .email("El email no es valido")
         .required("El email del cliente es obligatorio"),
     }),
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      const { nombre, apellido, empresa, email, telefono } = values;
+      try {
+        const { data } = await nuevoCliente({
+          variables: {
+            input: {
+              nombre,
+              apellido,
+              empresa,
+              email,
+              telefono,
+            },
+          },
+        });
+        Swal.fire(
+          "Buen trabajo!!",
+          "Cliente registrado exitosamente",
+          "success"
+        );
+        router.push("/"); // redireccionar hacia clientes
+      } catch (error) {
+        console.log(error);
+        Swal.fire("Uups!", `${error.message}`, "error");
+      }
     },
   });
 
