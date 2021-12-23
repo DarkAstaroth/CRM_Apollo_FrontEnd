@@ -19,11 +19,38 @@ const NUEVO_CLIENTE = gql`
   }
 `;
 
+const OBTENER_CLIENTES_USUARIO = gql`
+  query obtenerClientesVendedor {
+    obtenerClientesVendedor {
+      id
+      nombre
+      apellido
+      empresa
+      email
+    }
+  }
+`;
+
 const NuevoCliente = () => {
   const router = useRouter();
 
   // Mutation para crear nuevos clientes
-  const [nuevoCliente] = useMutation(NUEVO_CLIENTE);
+  const [nuevoCliente] = useMutation(NUEVO_CLIENTE, {
+    update(cache, { data: { nuevoCliente } }) {
+      // Obtener el bjeto de cace que deseamos actualizar
+      const { obtenerClientesVendedor } = cache.readQuery({
+        query: OBTENER_CLIENTES_USUARIO,
+      });
+
+      // reescribir el cache (el cache nunca se debe modificar)
+      cache.writeQuery({
+        query: OBTENER_CLIENTES_USUARIO,
+        data: {
+          obtenerClientesVendedor: [...obtenerClientesVendedor, nuevoCliente],
+        },
+      });
+    },
+  });
 
   const formik = useFormik({
     initialValues: {
