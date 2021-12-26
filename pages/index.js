@@ -46,6 +46,7 @@ const Home = () => {
               <th className="w-1/5 py-2">Empresa</th>
               <th className="w-1/5 py-2">Email</th>
               <th className="w-1/5 py-3">Eliminar</th>
+              <th className="w-1/5 py-3">Editar</th>
             </tr>
           </thead>
 
