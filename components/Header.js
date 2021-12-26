@@ -16,7 +16,7 @@ const Header = () => {
   const router = useRouter();
 
   // query de apollo
-  const { data, loading, error } = useQuery(OBTENER_USUARIO);
+  const { data, loading, error, client } = useQuery(OBTENER_USUARIO);
 
   // Proteger que no accedamos a data antes de tener resultados
   if (loading) {
@@ -25,6 +25,7 @@ const Header = () => {
   const { nombre, apellido } = data.obtenerUsuario;
 
   const cerrarSesion = () => {
+    client.clearStore();
     localStorage.removeItem("token");
     router.push("/login");
   };
