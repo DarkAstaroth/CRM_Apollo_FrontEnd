@@ -1,7 +1,45 @@
 import Swal from "sweetalert2";
+import { gql, useMutation } from "@apollo/client";
+
+const ELIMINAR_PRODUCTO = gql`
+  mutation eliminarProducto($id: ID!) {
+    eliminarProducto(id: $id)
+  }
+`;
+
+const OBTENER_PRODUCTOS = gql`
+  query obtenerProductos {
+    obtenerProductos {
+      id
+      nombre
+      precio
+      existencia
+    }
+  }
+`;
 
 const Producto = ({ producto }) => {
-  const { nombre, existencia, precio } = producto;
+  const { nombre, existencia, precio, id } = producto;
+
+  // Mutation para eliminar productos
+  const [eliminarProducto] = useMutation(ELIMINAR_PRODUCTO, {
+    update(cache) {
+      // obtener una copia del objeto de cache
+      const { obtenerProductos } = cache.readQuery({
+        query: OBTENER_PRODUCTOS,
+      });
+
+      // reescribir el cache
+      cache.writeQuery({
+        query: OBTENER_PRODUCTOS,
+        data: {
+          obtenerProductos: obtenerProductos.filter(
+            (productoActual) => productoActual.id !== id
+          ),
+        },
+      });
+    },
+  });
 
   const confirmarEliminarProducto = () => {
     Swal.fire({
@@ -17,15 +55,14 @@ const Producto = ({ producto }) => {
       if (result.value) {
         try {
           // ELiminar por id
-          const { data } = await eliminarCliente({
+          const { data } = await eliminarProducto({
             variables: {
               id,
             },
           });
-          console.log(data);
 
           // mostrar la alerta
-          Swal.fire("Eliminado!", data.eliminarCliente, "success");
+          Swal.fire("Eliminado!", data.eliminarProducto, "success");
         } catch (error) {
           Swal.fire(
             "Upss!",
